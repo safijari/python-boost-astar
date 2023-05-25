@@ -206,12 +206,12 @@ int main(int argc, char **argv)
       if(p[v] == v)
         break;
     }
-    cout << "Shortest path from " << name[start] << " to "
-         << name[goal] << ": ";
+    cout << "Shortest path from " << start << " to "
+         << goal << ": ";
     list<vertex>::iterator spi = shortest_path.begin();
-    cout << name[start];
+    cout << start;
     for(++spi; spi != shortest_path.end(); ++spi)
-      cout << " -> " << name[*spi];
+      cout << " -> " << *spi;
     cout << endl << "Total travel time: " << d[goal] << endl;
     return 0;
   }
