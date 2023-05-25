@@ -1,6 +1,7 @@
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+
 #include <vector>
 #include <iostream>
 #include <boost/graph/astar_search.hpp>
@@ -15,6 +16,7 @@
 #include <fstream>
 #include <math.h>    // for sqrt
 using namespace boost;
+namespace py = pybind11;
 
 struct location
 {
@@ -59,7 +61,7 @@ private:
 };
 
 typedef adjacency_list<listS, vecS, undirectedS, no_property,
-  property<edge_weight_t, cost> > mygraph_t;
+                       property<edge_weight_t, cost> > mygraph_t;
 typedef property_map<mygraph_t, edge_weight_t>::type WeightMap;
 typedef mygraph_t::vertex_descriptor astar_vertex;
 typedef mygraph_t::edge_descriptor edge_descriptor;
@@ -85,18 +87,18 @@ public:
     this->graph = graph;
     this->wmap = get(boost::edge_weight, this->graph);
     for (std::size_t j = 0; j < this->edges.size(); ++j) {
-        edge_descriptor e; bool inserted;
-        boost::tie(e, inserted) = add_edge(this->edges[j].first,
-                                        this->edges[j].second, this->graph);
-        this->wmap[e] = 1.0;
+      edge_descriptor e; bool inserted;
+      boost::tie(e, inserted) = add_edge(this->edges[j].first,
+                                         this->edges[j].second, this->graph);
+      this->wmap[e] = 1.0;
     }
   }
 
-  void run() {
+  void run(astar_vertex start, astar_vertex goal) {
     // pick random start/goal
-    mt19937 gen(time(0));
-    astar_vertex start = random_vertex(this->graph, gen);
-    astar_vertex goal = random_vertex(this->graph, gen);
+    // mt19937 gen(time(0));
+    // astar_vertex start = random_vertex(this->graph, gen);
+    // astar_vertex goal = random_vertex(this->graph, gen);
 
     auto g = this->graph;
 
@@ -104,29 +106,29 @@ public:
     std::vector<cost> d(num_vertices(g));
 
     try {
-        // call astar named parameter interface
-        astar_search
+      // call astar named parameter interface
+      astar_search
         (this->graph, start,
-        distance_heuristic<mygraph_t, cost, location*>
-            (&(this->nodes)[0], goal),
-        predecessor_map(&p[0]).distance_map(&d[0]).
-        visitor(astar_goal_visitor<astar_vertex>(goal)));
+         distance_heuristic<mygraph_t, cost, location*>
+         (&(this->nodes)[0], goal),
+         predecessor_map(&p[0]).distance_map(&d[0]).
+         visitor(astar_goal_visitor<astar_vertex>(goal)));
 
 
     } catch(found_goal fg) { // found a path to the goal
       std::list<astar_vertex> shortest_path;
-        for(astar_vertex v = goal;; v = p[v]) {
+      for(astar_vertex v = goal;; v = p[v]) {
         shortest_path.push_front(v);
         if(p[v] == v)
-            break;
-        }
-        std::cout << "Shortest path from " << start << " to "
-            << goal << ": ";
-        std::list<astar_vertex>::iterator spi = shortest_path.begin();
-                std::cout << start;
-        for(++spi; spi != shortest_path.end(); ++spi)
-                std::cout << " -> " << *spi;
-        std::cout << std::endl << "Total travel time: " << d[goal] << std::endl;
+          break;
+      }
+      std::cout << "Shortest path from " << start << " to "
+                << goal << ": ";
+      std::list<astar_vertex>::iterator spi = shortest_path.begin();
+      std::cout << start;
+      for(++spi; spi != shortest_path.end(); ++spi)
+        std::cout << " -> " << *spi;
+      std::cout << std::endl << "Total travel time: " << d[goal] << std::endl;
     }
 
   }
@@ -163,9 +165,25 @@ public:
 //   };
 
 //   AStar astar(locations, edge_array);
-//   astar.run();
+//   astar.run(0, 1);
 //   return 0;
 // }
 
 
-namespace py = pybind11;
+PYBIND11_MODULE(astar_cpp, m) {
+  py::class_<AStar>(m, "AStar")
+    .def(py::init<std::vector<location>, std::vector<astar_edge>>())
+    .def("run", &AStar::run)
+    // .def("set_heuristic", [](AStar::Generator &a_, std::string heuristic) {
+    //   a_.setHeuristic(AStar::Heuristic::euclidean);
+    // })
+    // .def("set_diagonal_movement", &AStar::Generator::setDiagonalMovement)
+    // .def("add_collision", &AStar::Generator::addCollision)
+    // .def("find_path", &AStar::Generator::findPath)
+    // .def("set_world_size", &AStar::Generator::setWorldSize)
+    ;
+  py::class_<location>(m, "location")
+    .def(py::init<int, int>())
+    .def_readonly("x", &location::x)
+    .def_readonly("y", &location::y);
+}
