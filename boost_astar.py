@@ -54,10 +54,13 @@ def deduplicate_edges(edges):
 
 
 class AStarOnImage:
-    def __init__(self, image):
-        self.nodes, self.edges, self.index_map = make_nodes_edges_index_map(image)
+    def __init__(self, image, use_diagonals=False):
+        self.nodes, self.edges, self.index_map = make_nodes_edges_index_map(
+            image, use_diagonals
+        )
         self.edges = deduplicate_edges(self.edges)
         self.astar = ac.AStar([ac.location(i[0], i[1]) for i in self.nodes], self.edges)
+        self.image = image
 
     def plan_by_index(self, start: int, end: int):
         return [self.nodes[i] for i in self.astar.run(start, end)]
@@ -67,8 +70,8 @@ class AStarOnImage:
         p1, p2 = start, end
         p1 = [int(p1[0]), int(p1[1])]
         p2 = [int(p2[0]), int(p2[1])]
-        assert is_valid(p1[0], p1[1]), f"p1 {p1} is not a node in the graph"
-        assert is_valid(p2[0], p2[1]), f"p2 {p2} is not a node in the graph"
+        assert is_valid(p1[0], p1[1], self.image), f"p1 {p1} is not a node in the graph"
+        assert is_valid(p2[0], p2[1], self.image), f"p2 {p2} is not a node in the graph"
         return [
             self.nodes[i]
             for i in self.astar.run(
