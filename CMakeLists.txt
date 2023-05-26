@@ -15,8 +15,3 @@ find_package(pybind11 REQUIRED)
 pybind11_add_module(astar_cpp PythonInterface.cpp)
 
 TARGET_LINK_LIBRARIES( astar_cpp PRIVATE ${Boost_LIBRARIES} )
-
-# ADD_EXECUTABLE( main main.cpp )
-# ADD_EXECUTABLE( main2 PythonInterface.cpp )
-
-# TARGET_LINK_LIBRARIES( main LINK_PUBLIC ${Boost_LIBRARIES} )
