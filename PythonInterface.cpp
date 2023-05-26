@@ -43,9 +43,8 @@ private:
   Vertex m_goal;
 };
 
-struct found_goal {}; // exception for termination
+struct found_goal {}; 
 
-// visitor that terminates when we find the goal
 template <class Vertex>
 class astar_goal_visitor : public boost::default_astar_visitor
 {
@@ -95,10 +94,6 @@ public:
   }
 
   std::list<astar_vertex> run(astar_vertex start, astar_vertex goal) {
-    // pick random start/goal
-    // mt19937 gen(time(0));
-    // astar_vertex start = random_vertex(this->graph, gen);
-    // astar_vertex goal = random_vertex(this->graph, gen);
 
     auto g = this->graph;
 
@@ -106,7 +101,6 @@ public:
     std::vector<cost> d(num_vertices(g));
 
     try {
-      // call astar named parameter interface
       astar_search
         (this->graph, start,
          distance_heuristic<mygraph_t, cost, location*>
@@ -115,78 +109,27 @@ public:
          visitor(astar_goal_visitor<astar_vertex>(goal)));
 
 
-    } catch(found_goal fg) { // found a path to the goal
+    } catch(found_goal fg) {
       std::list<astar_vertex> shortest_path;
       for(astar_vertex v = goal;; v = p[v]) {
         shortest_path.push_front(v);
         if(p[v] == v)
           break;
       }
-      // std::cout << "Shortest path from " << start << " to "
-      //           << goal << ": ";
       std::list<astar_vertex>::iterator spi = shortest_path.begin();
-      // std::cout << start;
-      // for(++spi; spi != shortest_path.end(); ++spi)
-      //   std::cout << " -> " << *spi;
-      // std::cout << std::endl << "Total travel time: " << d[goal] << std::endl;
       return shortest_path;
     }
 
-    // std::cout << "Didn't find a path from " << start << "to"
-    //           << goal << "!" << std::endl;
     return std::list<astar_vertex>();
 
   }
 };
 
 
-// enum nodes {
-//     Troy, LakePlacid, Plattsburgh, Massena, Watertown, Utica,
-//     Syracuse, Rochester, Buffalo, Ithaca, Binghamton, Woodstock,
-//     NewYork, N
-// };
-
-// int main() {
-//   std::vector<location> locations = { // lat/long
-//     {42.73, 73.68}, {44.28, 73.99}, {44.70, 73.46},
-//     {44.93, 74.89}, {43.97, 75.91}, {43.10, 75.23},
-//     {43.04, 76.14}, {43.17, 77.61}, {42.89, 78.86},
-//     {42.44, 76.50}, {42.10, 75.91}, {42.04, 74.11},
-//     {40.67, 73.94}
-//   };
-
-//   std::vector<astar_edge> edge_array = {
-//     astar_edge(Troy,Utica), astar_edge(Troy,LakePlacid),
-//     astar_edge(Troy,Plattsburgh), astar_edge(LakePlacid,Plattsburgh),
-//     astar_edge(Plattsburgh,Massena), astar_edge(LakePlacid,Massena),
-//     astar_edge(Massena,Watertown), astar_edge(Watertown,Utica),
-//     astar_edge(Watertown,Syracuse), astar_edge(Utica,Syracuse),
-//     astar_edge(Syracuse,Rochester), astar_edge(Rochester,Buffalo),
-//     astar_edge(Syracuse,Ithaca), astar_edge(Ithaca,Binghamton),
-//     astar_edge(Ithaca,Rochester), astar_edge(Binghamton,Troy),
-//     astar_edge(Binghamton,Woodstock), astar_edge(Binghamton,NewYork),
-//     astar_edge(Syracuse,Binghamton), astar_edge(Woodstock,Troy),
-//     astar_edge(Woodstock,NewYork)
-//   };
-
-//   AStar astar(locations, edge_array);
-//   astar.run(0, 1);
-//   return 0;
-// }
-
-
 PYBIND11_MODULE(astar_cpp, m) {
   py::class_<AStar>(m, "AStar")
     .def(py::init<std::vector<location>, std::vector<astar_edge>>())
-    .def("run", &AStar::run)
-    // .def("set_heuristic", [](AStar::Generator &a_, std::string heuristic) {
-    //   a_.setHeuristic(AStar::Heuristic::euclidean);
-    // })
-    // .def("set_diagonal_movement", &AStar::Generator::setDiagonalMovement)
-    // .def("add_collision", &AStar::Generator::addCollision)
-    // .def("find_path", &AStar::Generator::findPath)
-    // .def("set_world_size", &AStar::Generator::setWorldSize)
-    ;
+    .def("run", &AStar::run);
   py::class_<location>(m, "location")
     .def(py::init<int, int>())
     .def_readonly("x", &location::x)
