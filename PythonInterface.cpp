@@ -94,7 +94,7 @@ public:
     }
   }
 
-  void run(astar_vertex start, astar_vertex goal) {
+  std::list<astar_vertex> run(astar_vertex start, astar_vertex goal) {
     // pick random start/goal
     // mt19937 gen(time(0));
     // astar_vertex start = random_vertex(this->graph, gen);
@@ -122,14 +122,19 @@ public:
         if(p[v] == v)
           break;
       }
-      std::cout << "Shortest path from " << start << " to "
-                << goal << ": ";
+      // std::cout << "Shortest path from " << start << " to "
+      //           << goal << ": ";
       std::list<astar_vertex>::iterator spi = shortest_path.begin();
-      std::cout << start;
-      for(++spi; spi != shortest_path.end(); ++spi)
-        std::cout << " -> " << *spi;
-      std::cout << std::endl << "Total travel time: " << d[goal] << std::endl;
+      // std::cout << start;
+      // for(++spi; spi != shortest_path.end(); ++spi)
+      //   std::cout << " -> " << *spi;
+      // std::cout << std::endl << "Total travel time: " << d[goal] << std::endl;
+      return shortest_path;
     }
+
+    // std::cout << "Didn't find a path from " << start << "to"
+    //           << goal << "!" << std::endl;
+    return std::list<astar_vertex>();
 
   }
 };
