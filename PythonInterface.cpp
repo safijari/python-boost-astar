@@ -1,3 +1,15 @@
+// Original code copyright
+//=======================================================================
+// Copyright (c) 2004 Kristopher Beevers
+//
+// Distributed under the Boost Software License, Version 1.0. (See
+// accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+//=======================================================================
+//
+
+// Copyright (c) 2023 Jariullah Safi
+
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
