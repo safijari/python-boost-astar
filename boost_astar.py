@@ -18,7 +18,7 @@ def is_valid(x, y, image):
 
 
 @njit(cache=True)
-def make_nodes_edges_index_map(image):
+def make_nodes_edges_index_map(image, do_diagonals=False):
     index_map = np.ones(image.shape, "int64") * -1
 
     yvals, xvals = np.where(image != 0)
@@ -32,8 +32,11 @@ def make_nodes_edges_index_map(image):
             i += 1
 
     edges = []
+    deltas = [(-1, 0), (0, -1), (1, 0), (0, 1)]
+    if do_diagonals:
+        deltas.extend([(1, 1), (-1, -1), (1, -1), (-1, 1)])
     for nx, ny in nodes:
-        for dx, dy in [(-1, 0), (0, -1), (1, 0), (0, 1)]:
+        for dx, dy in deltas:
             x = nx + dx
             y = ny + dy
             if is_valid(x, y, image):
