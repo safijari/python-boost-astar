@@ -101,7 +101,9 @@ public:
       edge_descriptor e; bool inserted;
       boost::tie(e, inserted) = add_edge(this->edges[j].first,
                                          this->edges[j].second, this->graph);
-      this->wmap[e] = 1.0;
+      cost dx = this->nodes[this->edges[j].first].x - this->nodes[this->edges[j].second].x;
+      cost dy = this->nodes[this->edges[j].first].y - this->nodes[this->edges[j].second].y;
+      this->wmap[e] = ::sqrt(dx * dx + dy * dy);
     }
   }
 
