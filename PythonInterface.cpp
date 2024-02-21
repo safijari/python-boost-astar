@@ -145,7 +145,7 @@ PYBIND11_MODULE(astar_cpp, m) {
     .def(py::init<std::vector<location>, std::vector<astar_edge>>())
     .def("run", &AStar::run);
   py::class_<location>(m, "location")
-    .def(py::init<int, int>())
+    .def(py::init<float, float>())
     .def_readonly("x", &location::x)
     .def_readonly("y", &location::y);
 }

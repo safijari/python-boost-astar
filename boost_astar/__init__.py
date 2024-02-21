@@ -58,6 +58,7 @@ class AStarOnImage:
         self.nodes, self.edges, self.index_map = make_nodes_edges_index_map(
             image, use_diagonals
         )
+        print("made nodes and edges, deduplicating")
         self.edges = deduplicate_edges(self.edges)
         self.astar = ac.AStar([ac.location(i[0], i[1]) for i in self.nodes], self.edges)
         self.image = image
